@@ -22,5 +22,36 @@ jobs:
       - name: Run unit tests
         run: flutter test
 
-      - name: Run integration tests
+      - name: Run integration testsname: Flutter Web Deployment
+
+on:
+  push:
+    branches:
+      - main  # Berjalan saat push ke branch utama
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run Tests
+        [cite_start]run: flutter test  # Menjalankan Unit & Integration Test sesuai soal [cite: 8, 70]
+
+      - name: Build Web
+        run: flutter build web --base-href "/e-voting-flutter/" # Ganti dengan nama repo Anda
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
         run: flutter test integration_test/e_voting_integration_test.dart
