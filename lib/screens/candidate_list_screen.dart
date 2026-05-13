@@ -11,7 +11,7 @@ import 'package:pemilihan_ketua_kelas_informatika/widgets/error_dialog.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/loading_widget.dart';
 
 class CandidateListScreen extends StatefulWidget {
-  const CandidateListScreen({Key? key}) : super(key: key);
+  const CandidateListScreen({super.key});
 
   @override
   State<CandidateListScreen> createState() => _CandidateListScreenState();
@@ -22,6 +22,7 @@ class _CandidateListScreenState extends State<CandidateListScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final authProvider = context.read<AuthProvider>();
       if (authProvider.currentUser != null &&
           authProvider.currentUser!.isAdmin) {
@@ -96,16 +97,16 @@ class _CandidateListScreenState extends State<CandidateListScreen> {
         await authProvider.setHasVoted(true);
         if (!mounted) return;
         showDialog(
-          context: context,
+          context: this.context,
           barrierDismissible: false,
-          builder: (context) => AlertDialog(
+          builder: (dialogContext) => AlertDialog(
             title: const Text('Vote Berhasil'),
             content: const Text('Terima kasih atas suara Anda!'),
             actions: [
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushReplacementNamed(context, AppRoutes.result);
+                  Navigator.pop(dialogContext);
+                  Navigator.pushReplacementNamed(this.context, AppRoutes.result);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A365D),
@@ -118,7 +119,7 @@ class _CandidateListScreenState extends State<CandidateListScreen> {
       } else {
         if (!mounted) return;
         ErrorDialog.show(
-          context,
+          this.context,
           title: 'Vote Gagal',
           message: voteProvider.errorMessage ??
               'Terjadi kesalahan saat mengirim suara.',

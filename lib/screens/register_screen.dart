@@ -8,7 +8,7 @@ import 'package:pemilihan_ketua_kelas_informatika/widgets/custom_textfield.dart'
 import 'package:pemilihan_ketua_kelas_informatika/widgets/error_dialog.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -67,12 +67,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _passwordController.text,
           )
           .then((success) {
-        if (success && mounted) {
+        if (success) {
+          if (!mounted) return;
           // Show success dialog
           showDialog(
-            context: context,
+            context: this.context,
             barrierDismissible: false,
-            builder: (context) => AlertDialog(
+            builder: (dialogContext) => AlertDialog(
               title: const Text('Registrasi Berhasil'),
               content: const Text(
                 'Akun Anda telah terdaftar. Silakan login dengan NIM dan password yang telah Anda buat.',
@@ -80,9 +81,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               actions: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context); // Close dialog
+                    Navigator.pop(dialogContext); // Close dialog
                     Navigator.pushReplacementNamed(
-                      context,
+                      this.context,
                       AppRoutes.login,
                     );
                   },
@@ -109,8 +110,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               authProvider.errorMessage!.isNotEmpty &&
               authProvider.isLoading == false) {
             Future.microtask(() {
+              if (!mounted) return;
               ErrorDialog.show(
-                context,
+                this.context,
                 title: 'Registrasi Gagal',
                 message: authProvider.errorMessage!,
               );

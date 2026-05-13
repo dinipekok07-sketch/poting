@@ -7,7 +7,7 @@ import 'package:pemilihan_ketua_kelas_informatika/utils/helpers.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/custom_button.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -40,9 +40,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Container(
                     width: 120,
                     height: 120,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         colors: [Color(0xFF1A365D), Color(0xFF3182CE)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -165,9 +165,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: const Color(0xFF1A5F7A),
                                 ),
                                 const SizedBox(width: 12),
-                                Text(
+                                const Text(
                                   'Mode Gelap',
-                                  style: const TextStyle(fontSize: 14),
+                                  style: TextStyle(fontSize: 14),
                                 ),
                               ],
                             ),
@@ -176,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onChanged: (value) {
                                 themeProvider.setDarkMode(value);
                               },
-                              activeColor: const Color(0xFF00B4D8),
+                              activeThumbColor: const Color(0xFF00B4D8),
                             ),
                           ],
                         ),
@@ -218,20 +218,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Konfirmasi Logout'),
         content: const Text('Apakah Anda yakin ingin logout?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Batal'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
-              context.read<AuthProvider>().logout().then((_) {
+              Navigator.pop(dialogContext);
+              this.context.read<AuthProvider>().logout().then((_) {
+                if (!mounted) return;
                 Navigator.pushReplacementNamed(
-                  context,
+                  this.context,
                   AppRoutes.login,
                 );
               });

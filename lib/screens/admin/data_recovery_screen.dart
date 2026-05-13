@@ -3,7 +3,7 @@ import 'package:pemilihan_ketua_kelas_informatika/services/local_storage.dart';
 import 'dart:convert';
 
 class DataRecoveryScreen extends StatefulWidget {
-  const DataRecoveryScreen({Key? key}) : super(key: key);
+  const DataRecoveryScreen({super.key});
 
   @override
   State<DataRecoveryScreen> createState() => _DataRecoveryScreenState();
@@ -58,6 +58,7 @@ class _DataRecoveryScreenState extends State<DataRecoveryScreen> {
   Future<void> _restoreCandidates() async {
     if (_candidatesData.isNotEmpty) {
       await LocalStorage.setString('candidates', jsonEncode(_candidatesData));
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Data kandidat berhasil direstore')),
       );

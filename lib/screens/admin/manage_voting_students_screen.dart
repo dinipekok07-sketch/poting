@@ -4,7 +4,7 @@ import 'package:pemilihan_ketua_kelas_informatika/services/auth_service.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/error_dialog.dart';
 
 class ManageVotingStudentsScreen extends StatefulWidget {
-  const ManageVotingStudentsScreen({Key? key}) : super(key: key);
+  const ManageVotingStudentsScreen({super.key});
 
   @override
   State<ManageVotingStudentsScreen> createState() =>
@@ -290,7 +290,7 @@ class _ManageVotingStudentsScreenState extends State<ManageVotingStudentsScreen>
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
               border: Border.all(color: Colors.blue),
               borderRadius: BorderRadius.circular(12),
             ),

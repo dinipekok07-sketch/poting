@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pemilihan_ketua_kelas_informatika/config/routes.dart';
 import 'package:pemilihan_ketua_kelas_informatika/providers/candidate_provider.dart';
 import 'package:pemilihan_ketua_kelas_informatika/providers/vote_provider.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/vote_result_chart.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/loading_widget.dart';
 
 class ResultScreen extends StatefulWidget {
-  const ResultScreen({Key? key}) : super(key: key);
+  const ResultScreen({super.key});
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -37,7 +38,7 @@ class _ResultScreenState extends State<ResultScreen> {
             child: Center(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: SegmentedButton<bool>(
@@ -110,7 +111,7 @@ class _ResultScreenState extends State<ResultScreen> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Colors.grey.withValues(alpha: 0.1),
                           spreadRadius: 1,
                           blurRadius: 5,
                         ),
@@ -250,11 +251,20 @@ class _ResultScreenState extends State<ResultScreen> {
                       );
                     },
                   ),
+                  const SizedBox(height: 80), // Space for FAB
                 ],
               ),
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
+        },
+        icon: const Icon(Icons.home),
+        label: const Text('Kembali ke Dashboard'),
+        backgroundColor: const Color(0xFF1A365D),
       ),
     );
   }

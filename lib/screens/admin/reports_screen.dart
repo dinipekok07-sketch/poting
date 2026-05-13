@@ -7,13 +7,14 @@ import 'dart:io';
 import 'package:share_plus/share_plus.dart';
 import 'package:pemilihan_ketua_kelas_informatika/providers/candidate_provider.dart';
 import 'package:pemilihan_ketua_kelas_informatika/providers/vote_provider.dart';
+import 'package:pemilihan_ketua_kelas_informatika/utils/helpers.dart';
 import 'package:pemilihan_ketua_kelas_informatika/providers/schedule_provider.dart';
 import 'package:pemilihan_ketua_kelas_informatika/services/auth_service.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/custom_button.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/vote_result_chart.dart';
 
 class ReportsScreen extends StatefulWidget {
-  const ReportsScreen({Key? key}) : super(key: key);
+  const ReportsScreen({super.key});
 
   @override
   State<ReportsScreen> createState() => _ReportsScreenState();
@@ -62,7 +63,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               pw.SizedBox(height: 20),
               pw.Text('Hasil Voting:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 10),
-              pw.Table.fromTextArray(
+              pw.TableHelper.fromTextArray(
                 headers: ['No', 'Nama Kandidat', 'Suara', 'Persentase'],
                 data: List<List<String>>.generate(
                   candidates.length,
@@ -90,11 +91,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
       await file.writeAsBytes(await pdf.save());
 
       await Share.shareXFiles([XFile(file.path)], text: 'Laporan Hasil Voting');
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('PDF berhasil diexport')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error export PDF: $e')),
       );
@@ -146,11 +149,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
       await file.writeAsBytes(workbook.encode()!);
 
       await Share.shareXFiles([XFile(file.path)], text: 'Laporan Hasil Voting');
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Excel berhasil diexport')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error export Excel: $e')),
       );
@@ -250,7 +255,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -280,10 +285,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundImage: candidate.photoUrl1 != null
-                              ? NetworkImage(candidate.photoUrl1!)
-                              : null,
-                          child: candidate.photoUrl1 == null
+                          backgroundImage:
+                              AppHelpers.imageProviderFromUrl(candidate.photoUrl1),
+                          child: AppHelpers.imageProviderFromUrl(candidate.photoUrl1) == null
                               ? Text(candidate.id.toString())
                               : null,
                         ),
@@ -387,9 +391,9 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -408,7 +412,7 @@ class _SummaryCard extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 12,
-              color: color.withOpacity(0.8),
+              color: color.withValues(alpha: 0.8),
             ),
             textAlign: TextAlign.center,
           ),

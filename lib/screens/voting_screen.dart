@@ -10,7 +10,7 @@ import 'package:pemilihan_ketua_kelas_informatika/widgets/error_dialog.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/loading_widget.dart';
 
 class VotingScreen extends StatefulWidget {
-  const VotingScreen({Key? key}) : super(key: key);
+  const VotingScreen({super.key});
 
   @override
   State<VotingScreen> createState() => _VotingScreenState();
@@ -20,8 +20,9 @@ class _VotingScreenState extends State<VotingScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final authProvider = context.read<AuthProvider>();
+      final voteProvider = context.read<VoteProvider>();
       if (authProvider.currentUser != null &&
           authProvider.currentUser!.isAdmin) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -33,17 +34,23 @@ class _VotingScreenState extends State<VotingScreen> {
         Navigator.pop(context);
         return;
       }
-      if (authProvider.currentUser != null &&
-          authProvider.currentUser!.hasVoted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Anda sudah melakukan voting sebelumnya'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-        Navigator.pop(context);
-        return;
+
+      // Check if user has voted using vote provider
+      if (authProvider.currentUser != null) {
+        await voteProvider.checkUserVoted(authProvider.currentUser!.id);
+        if (!mounted) return;
+        if (voteProvider.hasVoted) {
+          ScaffoldMessenger.of(this.context).showSnackBar(
+            const SnackBar(
+              content: Text('Anda sudah melakukan voting sebelumnya'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          Navigator.pop(this.context);
+          return;
+        }
       }
+
       context.read<CandidateProvider>().fetchCandidates();
     });
   }
@@ -58,6 +65,15 @@ class _VotingScreenState extends State<VotingScreen> {
         context,
         title: 'Akses Ditolak',
         message: 'Admin tidak dapat melakukan voting.',
+      );
+      return;
+    }
+
+    if (voteProvider.hasVoted) {
+      ErrorDialog.show(
+        context,
+        title: 'Voting Sudah Dilakukan',
+        message: 'Anda sudah melakukan voting sebelumnya.',
       );
       return;
     }
@@ -102,39 +118,37 @@ class _VotingScreenState extends State<VotingScreen> {
 
       if (success) {
         await authProvider.setHasVoted(true);
-        if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => AlertDialog(
-              title: const Text('Vote Berhasil'),
-              content: const Text('Terima kasih atas suara Anda!'),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacementNamed(
-                      context,
-                      AppRoutes.result,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A365D),
-                  ),
-                  child: const Text('Lihat Hasil'),
+        if (!mounted) return;
+        showDialog(
+          context: this.context,
+          barrierDismissible: false,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Vote Berhasil'),
+            content: const Text('Terima kasih atas suara Anda!'),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  Navigator.pushReplacementNamed(
+                    this.context,
+                    AppRoutes.result,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1A365D),
                 ),
-              ],
-            ),
-          );
-        }
+                child: const Text('Lihat Hasil'),
+              ),
+            ],
+          ),
+        );
       } else {
-        if (mounted) {
-          ErrorDialog.show(
-            context,
-            title: 'Vote Gagal',
-            message: voteProvider.errorMessage ?? 'Terjadi kesalahan',
-          );
-        }
+        if (!mounted) return;
+        ErrorDialog.show(
+          this.context,
+          title: 'Vote Gagal',
+          message: voteProvider.errorMessage ?? 'Terjadi kesalahan',
+        );
       }
     }
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:pemilihan_ketua_kelas_informatika/models/candidate_model.dart';
+import 'package:pemilihan_ketua_kelas_informatika/utils/helpers.dart';
 
 class CandidateCard extends StatelessWidget {
   final CandidateModel candidate;
@@ -9,12 +9,12 @@ class CandidateCard extends StatelessWidget {
   final VoidCallback? onDetail;
 
   const CandidateCard({
-    Key? key,
+    super.key,
     required this.candidate,
     required this.onVote,
     this.isSelected = false,
     this.onDetail,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +37,8 @@ class CandidateCard extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF1A365D).withOpacity(0.08),
-                      const Color(0xFF3182CE).withOpacity(0.08),
+                      const Color(0xFF1A365D).withValues(alpha: 0.08),
+                      const Color(0xFF3182CE).withValues(alpha: 0.08),
                     ],
                   )
                 : null,
@@ -93,7 +93,7 @@ class CandidateCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3182CE).withOpacity(0.1),
+                  color: const Color(0xFF3182CE).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
@@ -179,43 +179,46 @@ class _CandidateAvatar extends StatelessWidget {
   final String label;
 
   const _CandidateAvatar({
-    Key? key,
     required this.imageUrl,
     required this.label,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    ImageProvider? imageProvider;
-
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
-      if (imageUrl!.startsWith('http://') ||
-          imageUrl!.startsWith('https://')) {
-        imageProvider = NetworkImage(imageUrl!);
-      } else if (imageUrl!.length > 100) {
-        try {
-          imageProvider = MemoryImage(base64Decode(imageUrl!));
-        } catch (e) {
-          // Jika gagal decode, fallback ke text
-          imageProvider = null;
-        }
-      }
-    }
+    final imageProvider = AppHelpers.imageProviderFromUrl(imageUrl);
 
     return CircleAvatar(
       radius: 24,
       backgroundColor: const Color(0xFF3182CE),
-      backgroundImage: imageProvider,
-      child: imageProvider == null
-          ? Text(
-              label.isNotEmpty ? label[0].toUpperCase() : 'K',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+      child: ClipOval(
+        child: imageProvider != null
+            ? Image(
+                image: imageProvider,
+                width: 48,
+                height: 48,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Text(
+                    label.isNotEmpty ? label[0].toUpperCase() : 'K',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              )
+            : Center(
+                child: Text(
+                  label.isNotEmpty ? label[0].toUpperCase() : 'K',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
               ),
-            )
-          : null,
+      ),
     );
   }
 }

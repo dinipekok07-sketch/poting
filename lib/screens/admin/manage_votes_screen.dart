@@ -8,7 +8,7 @@ import 'package:pemilihan_ketua_kelas_informatika/providers/vote_provider.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/error_dialog.dart';
 
 class ManageVotesScreen extends StatefulWidget {
-  const ManageVotesScreen({Key? key}) : super(key: key);
+  const ManageVotesScreen({super.key});
 
   @override
   State<ManageVotesScreen> createState() => _ManageVotesScreenState();
@@ -30,6 +30,7 @@ class _ManageVotesScreenState extends State<ManageVotesScreen> {
   }
 
   Future<void> _loadData() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _error = null;
@@ -42,9 +43,11 @@ class _ManageVotesScreenState extends State<ManageVotesScreen> {
     } catch (e) {
       _error = e.toString();
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -82,11 +85,13 @@ class _ManageVotesScreenState extends State<ManageVotesScreen> {
     try {
       await provider.deleteVote(voteId);
       await _loadData();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vote berhasil dihapus.')), 
+      if (!mounted) return;
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        const SnackBar(content: Text('Vote berhasil dihapus.')),
       );
     } catch (e) {
-      ErrorDialog.show(context, title: 'Error', message: e.toString());
+      if (!mounted) return;
+      ErrorDialog.show(this.context, title: 'Error', message: e.toString());
     }
   }
 
@@ -95,11 +100,13 @@ class _ManageVotesScreenState extends State<ManageVotesScreen> {
     try {
       await provider.resetVote(userId);
       await _loadData();
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (!mounted) return;
+      ScaffoldMessenger.of(this.context).showSnackBar(
         const SnackBar(content: Text('Status voting siswa berhasil direset.')),
       );
     } catch (e) {
-      ErrorDialog.show(context, title: 'Error', message: e.toString());
+      if (!mounted) return;
+      ErrorDialog.show(this.context, title: 'Error', message: e.toString());
     }
   }
 
@@ -108,11 +115,13 @@ class _ManageVotesScreenState extends State<ManageVotesScreen> {
     try {
       await provider.updateVote(voteId, candidateId);
       await _loadData();
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (!mounted) return;
+      ScaffoldMessenger.of(this.context).showSnackBar(
         const SnackBar(content: Text('Vote berhasil diupdate.')),
       );
     } catch (e) {
-      ErrorDialog.show(context, title: 'Error', message: e.toString());
+      if (!mounted) return;
+      ErrorDialog.show(this.context, title: 'Error', message: e.toString());
     }
   }
 
@@ -132,7 +141,7 @@ class _ManageVotesScreenState extends State<ManageVotesScreen> {
                 const Text('Pilih kandidat baru untuk vote ini:'),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<int>(
-                  value: selectedCandidateId,
+                  initialValue: selectedCandidateId,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),

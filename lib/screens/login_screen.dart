@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pemilihan_ketua_kelas_informatika/config/routes.dart';
 import 'package:pemilihan_ketua_kelas_informatika/providers/auth_provider.dart';
+import 'package:pemilihan_ketua_kelas_informatika/services/auth_service.dart';
 import 'package:pemilihan_ketua_kelas_informatika/utils/validators.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/custom_button.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/custom_textfield.dart';
 import 'package:pemilihan_ketua_kelas_informatika/widgets/error_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -44,18 +45,20 @@ class _LoginScreenState extends State<LoginScreen> {
           // Listen to auth state changes
           if (authProvider.isLoggedIn && !authProvider.isLoading) {
             Future.microtask(() {
+              if (!mounted) return;
               final route = authProvider.currentUser?.isAdmin == true
                   ? AppRoutes.adminDashboard
-                  : AppRoutes.voting;
-              Navigator.of(context).pushReplacementNamed(route);
+                  : AppRoutes.home;
+              Navigator.of(this.context).pushReplacementNamed(route);
             });
           }
 
           if (authProvider.errorMessage != null &&
               authProvider.errorMessage!.isNotEmpty) {
             Future.microtask(() {
+              if (!mounted) return;
               ErrorDialog.show(
-                context,
+                this.context,
                 title: 'Login Gagal',
                 message: authProvider.errorMessage!,
               );
@@ -181,19 +184,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      Center(
+                      const Center(
                         child: Column(
                           children: [
-                            const Text(
+                            Text(
                               'Data login valid:',
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 12,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Siswa: 2024230001 - 2024230040\nPassword: informatika 2024',
+                            SizedBox(height: 8),
+                            Text(
+                              'Siswa: 2024230001 - 2024230040\nPassword: ${AuthService.defaultPassword}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              'Admin: ${AuthService.adminUsername}\nPassword: ${AuthService.adminPassword}',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
